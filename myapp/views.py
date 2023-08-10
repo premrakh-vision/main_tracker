@@ -53,22 +53,55 @@ class UserView(ViewSet):
         if serializer_data.is_valid():
             serializer_data.save()
             d1=dict(serializer_data.data)
-            d1['start_time']=d1['start_time'].split('.')[0].replace('T',' ').replace('Z','')
-            d1['end_time']=d1['end_time'].split('.')[0].replace('T',' ').replace('Z','')
+            # d1['start_time']=d1['start_time'].split('.')[0].replace('T',' ')
+            # d1['end_time']=d1['end_time'].split('.')[0].replace('T',' ')
+            d1['start_time']=d1['start_time'].split('.')[0].replace('T',' ')
+            d1['end_time']=d1['end_time'].split('.')[0].replace('T',' ')
+            print('create_data',d1)
             return Response(d1,status=status.HTTP_200_OK)
         return Response(serializer_data.errors)
+       
 
     def list(self,request):
         try:
             user_obj=User.objects.get(host=request.query_params.get('host'))
             serializer_data=UserSerializer(user_obj)
             d1=dict(serializer_data.data)
-            d1['start_time']=d1['start_time'].split('.')[0].replace('T',' ').replace('Z','')
-            d1['end_time']=d1['end_time'].split('.')[0].replace('T',' ').replace('Z','')
+            # d1['start_time']=d1['start_time'].split('+')[0].split('.')[0].replace('T',' ')
+            # d1['end_time']=d1['end_time'].split('+')[0].split('.')[0].replace('T',' ')
+            d1['start_time']=d1['start_time'].split('.')[0].replace('T',' ')
+            if (str(d1['start_time']).__contains__("+05:30")):
+                d1['start_time']=d1['start_time'].replace("+05:30","")
+                
+            d1['end_time']=d1['end_time'].split('.')[0].replace('T',' ')
+            if (str(d1['end_time']).__contains__("+05:30")):
+                d1['end_time']=d1['end_time'].replace("+05:30","")
+                
+            # print("list data",d1)
+            
             return Response(d1,status=status.HTTP_200_OK)
         except:
             return Response({'msg':'Not Found !!!'},status=status.HTTP_404_NOT_FOUND)
+
+
+class EventOffView(ViewSet):
+    authentication_classes = [BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+    
+    def create(self,request):
         
+        d1=EventOffCreateSerializer(data=request.data)
+        if d1.is_valid():
+            d1.save()
+            return Response(d1.data,status=status.HTTP_200_OK)
+        return Response(d1.errors,status=status.HTTP_400_BAD_REQUEST)
+      
+    def list(self,request):
+        user_obj=EventOff.objects.filter(user__host=request.query_params.get('host'))
+        d1=EventOffSerializer(user_obj,many=True)
+        return Response(d1.data)
+        
+
 def view_screen(request):
     if request.method=='POST':
         name_query= User.objects.filter(username=request.POST['username'].lower())        

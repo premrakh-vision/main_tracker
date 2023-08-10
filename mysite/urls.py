@@ -12,6 +12,7 @@ from django.views.static import serve
 route=DefaultRouter()
 route.register('data',ScreenShotView,basename='data')
 route.register('user',UserView,basename='user')
+route.register('event_off',EventOffView,basename='event_off')
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('',include(route.urls)),

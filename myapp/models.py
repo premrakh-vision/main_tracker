@@ -18,6 +18,8 @@ class ScreenShot(models.Model):
 
 # default=timezone.now().replace(hour=9, minute=00, second=0),
 
+
+
 class User(models.Model):
     username=models.CharField(max_length=100,unique=True,default=None,null=True,blank=True)
     host=models.CharField(max_length=70)
@@ -28,3 +30,15 @@ class User(models.Model):
 
     def __str__(self):
         return self.host
+
+
+class EventOff(models.Model):
+    user=models.ForeignKey(User,on_delete=models.CASCADE)
+    pre_off_time=models.DateTimeField()
+    post_off_time=models.DateTimeField()
+    
+    def __str__(self):
+        return f"{self.user} - {self.pre_off_time}"
+    
+    
+    
